@@ -1,6 +1,5 @@
 import 'package:flexible_polyline_dart/converter.dart';
 import 'package:flexible_polyline_dart/latlngz.dart';
-import 'package:tuple/tuple.dart';
 
 class FlexiblePolyline {
   static const int version = 1;
@@ -148,9 +147,8 @@ class FlexiblePolyline {
   /// @return type of {@link ThirdDimension}
   static ThirdDimension getThirdDimension(List<String> encoded) {
     int index = 0;
-    Tuple2<int, int> headerResult =
-        _Decoder.decodeHeaderFromString(encoded, index);
-    final int header = headerResult.item1;
+    (int, int) headerResult = _Decoder.decodeHeaderFromString(encoded, index);
+    final int header = headerResult.$1;
     return ThirdDimension.values[(header >> 4) & 7];
   }
 }
@@ -180,9 +178,9 @@ class _Decoder {
   bool hasThirdDimension() => thirdDimension != ThirdDimension.ABSENT;
 
   void _decodeHeader() {
-    final Tuple2<int, int> headerResult = decodeHeaderFromString(split, index);
-    int header = headerResult.item1;
-    index = headerResult.item2;
+    final (int, int) headerResult = decodeHeaderFromString(split, index);
+    int header = headerResult.$1;
+    index = headerResult.$2;
     precision = header & 15; // we pick the first 3 bits only
     header = header >> 4;
 
@@ -192,36 +190,32 @@ class _Decoder {
   }
 
   // Returns polyline header, new index in tuple.
-  static Tuple2<int, int> decodeHeaderFromString(
-      List<String> encoded, int index) {
+  static (int, int) decodeHeaderFromString(List<String> encoded, int index) {
     // Decode the header version
-    final Tuple2<int, int> result =
-        Converter.decodeUnsignedVarint(encoded, index);
+    final (int, int) result = Converter.decodeUnsignedVarint(encoded, index);
 
-    if (result.item1 != FlexiblePolyline.version) {
+    if (result.$1 != FlexiblePolyline.version) {
       throw ArgumentError("Invalid format version");
     }
 
     // Decode the polyline header
-    return Converter.decodeUnsignedVarint(encoded, result.item2);
+    return Converter.decodeUnsignedVarint(encoded, result.$2);
   }
 
   LatLngZ? decodeOne() {
     if (index == encoded.length) {
       return null;
     }
-    final Tuple2<double, int> latResult =
-        latConverter.decodeValue(split, index);
-    index = latResult.item2;
-    final Tuple2<double, int> lngResult =
-        lngConverter.decodeValue(split, index);
-    index = lngResult.item2;
+    final (double, int) latResult = latConverter.decodeValue(split, index);
+    index = latResult.$2;
+    final (double, int) lngResult = lngConverter.decodeValue(split, index);
+    index = lngResult.$2;
     if (hasThirdDimension()) {
-      final Tuple2<double, int> zResult = zConverter.decodeValue(split, index);
-      index = zResult.item2;
-      return LatLngZ(latResult.item1, lngResult.item1, zResult.item1);
+      final (double, int) zResult = zConverter.decodeValue(split, index);
+      index = zResult.$2;
+      return LatLngZ(latResult.$1, lngResult.$1, zResult.$1);
     }
-    return LatLngZ(latResult.item1, lngResult.item1);
+    return LatLngZ(latResult.$1, lngResult.$1);
   }
 }
 

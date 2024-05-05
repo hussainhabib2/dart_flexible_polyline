@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:tuple/tuple.dart';
-
 import 'flutter_flexible_polyline.dart';
 
 ///
@@ -21,8 +19,7 @@ class Converter {
   }
 
   // Returns decoded int, new index in tuple
-  static Tuple2<int, int> decodeUnsignedVarint(
-      List<String> encoded, int index) {
+  static (int, int) decodeUnsignedVarint(List<String> encoded, int index) {
     int shift = 0;
     int delta = 0;
     int value;
@@ -35,7 +32,7 @@ class Converter {
       index++;
       delta |= (value & 0x1F) << shift;
       if ((value & 0x20) == 0) {
-        return Tuple2(delta, index);
+        return (delta, index);
       } else {
         shift += 5;
       }
@@ -44,22 +41,22 @@ class Converter {
     if (shift > 0) {
       throw ArgumentError("Invalid encoding");
     }
-    return Tuple2(0, index);
+    return (0, index);
   }
 
   // Decode single coordinate (say lat|lng|z) starting at index
   // Returns decoded coordinate, new index in tuple
-  Tuple2<double, int> decodeValue(List<String> encoded, int index) {
-    final Tuple2<int, int> result = decodeUnsignedVarint(encoded, index);
+  (double, int) decodeValue(List<String> encoded, int index) {
+    final (int, int) result = decodeUnsignedVarint(encoded, index);
     double coordinate = 0;
-    int delta = result.item1;
+    int delta = result.$1;
     if ((delta & 1) != 0) {
       delta = ~delta;
     }
     delta = delta >> 1;
     lastValue += delta;
     coordinate = lastValue / multiplier;
-    return Tuple2(coordinate, result.item2);
+    return (coordinate, result.$2);
   }
 
   static String encodeUnsignedVarint(int value) {

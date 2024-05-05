@@ -1,17 +1,16 @@
 name: flexible_polyline_dart
 description: "Flexible Polyline encoder and decoder for dart"
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/hussainhabib2/dart_flexible_polyline
 issue_tracker: https://github.com/hussainhabib2/dart_flexible_polyline/issues
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: ">=3.2.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  tuple: ^2.0.2
 
 dev_dependencies:
   flutter_test:
