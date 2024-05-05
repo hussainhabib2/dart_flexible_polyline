@@ -147,8 +147,9 @@ class FlexiblePolyline {
   /// @return type of {@link ThirdDimension}
   static ThirdDimension getThirdDimension(List<String> encoded) {
     int index = 0;
-    (int, int) headerResult = _Decoder.decodeHeaderFromString(encoded, index);
-    final int header = headerResult.$1;
+    (BigInt, int) headerResult =
+        _Decoder.decodeHeaderFromString(encoded, index);
+    final int header = headerResult.$1.toInt();
     return ThirdDimension.values[(header >> 4) & 7];
   }
 }
@@ -178,8 +179,8 @@ class _Decoder {
   bool hasThirdDimension() => thirdDimension != ThirdDimension.ABSENT;
 
   void _decodeHeader() {
-    final (int, int) headerResult = decodeHeaderFromString(split, index);
-    int header = headerResult.$1;
+    final (BigInt, int) headerResult = decodeHeaderFromString(split, index);
+    int header = headerResult.$1.toInt();
     index = headerResult.$2;
     precision = header & 15; // we pick the first 3 bits only
     header = header >> 4;
@@ -190,11 +191,11 @@ class _Decoder {
   }
 
   // Returns polyline header, new index in tuple.
-  static (int, int) decodeHeaderFromString(List<String> encoded, int index) {
+  static (BigInt, int) decodeHeaderFromString(List<String> encoded, int index) {
     // Decode the header version
-    final (int, int) result = Converter.decodeUnsignedVarint(encoded, index);
+    final (BigInt, int) result = Converter.decodeUnsignedVarint(encoded, index);
 
-    if (result.$1 != FlexiblePolyline.version) {
+    if (result.$1.toInt() != FlexiblePolyline.version) {
       throw ArgumentError("Invalid format version");
     }
 
@@ -256,8 +257,9 @@ class _Encoder {
     final double res =
         ((thirdDimPrecision << 7) | (thirdDimensionValue << 4) | precision)
             .toDouble();
-    result += Converter.encodeUnsignedVarint(FlexiblePolyline.version);
-    result += Converter.encodeUnsignedVarint(res.toInt());
+    result +=
+        Converter.encodeUnsignedVarint(BigInt.from(FlexiblePolyline.version));
+    result += Converter.encodeUnsignedVarint(BigInt.from(res));
   }
 
   void addTuple(double lat, double lng) {
