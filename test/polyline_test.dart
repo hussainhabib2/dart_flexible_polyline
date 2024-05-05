@@ -6,7 +6,6 @@ import 'package:flexible_polyline_dart/flutter_flexible_polyline.dart';
 import 'package:flexible_polyline_dart/latlngz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import "package:path/path.dart" show dirname, join;
-import 'package:tuple/tuple.dart';
 
 void main() {
   test('testInvalidCoordinates', () {
@@ -105,8 +104,8 @@ void main() {
     final encoded = "h_wqiB".split('');
     double expected = -179.98321;
     Converter conv = new Converter(5);
-    Tuple2<double, int> result = conv.decodeValue(encoded, 0);
-    expect(result.item1, expected);
+    (double, int) result = conv.decodeValue(encoded, 0);
+    expect(result.$1, expected);
   });
 
   test('testSimpleLatLngDecoding', () {
